@@ -15,11 +15,14 @@
             --border-light: #e2e8f0;
             --primary-accent: #2563eb;
             
-            /* 紅框與黑框顏色優化 */
             --input-red: #f43f5e;       
             --input-red-bg: #fff5f5;
             --output-black: #1e293b;    
             --output-black-bg: #f1f5f9;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
@@ -30,6 +33,7 @@
             display: flex;
             justify-content: center;
             -webkit-font-smoothing: antialiased;
+            margin: 0;
         }
 
         .container {
@@ -72,13 +76,14 @@
             align-items: center;
             gap: 8px;
             transition: all 0.2s ease;
+            flex-shrink: 0;
         }
         .print-btn:hover {
             background-color: #334155;
             transform: translateY(-1px);
         }
 
-        /* EPS 時間軸區塊 */
+        /* EPS 時間軸區塊 - 優化橫向滾動體驗 */
         .eps-flow-container {
             display: flex;
             align-items: center;
@@ -89,8 +94,18 @@
             border-radius: 12px;
             border: 1px solid var(--border-light);
             margin-bottom: 35px;
-            gap: 6px;
+            gap: 12px;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* 美化手機端的滾動條 */
+        .eps-flow-container::-webkit-scrollbar, .table-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        .eps-flow-container::-webkit-scrollbar-thumb, .table-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
         }
 
         .year-group {
@@ -142,13 +157,14 @@
             border-color: transparent transparent transparent #cbd5e1;
         }
 
+        /* 輸入框外觀定義 */
         .input-red-core {
             border: 2px solid var(--input-red);
             background-color: var(--input-red-bg);
             color: var(--text-main);
             border-radius: 8px;
             padding: 8px;
-            width: 75px;
+            width: 85px;
             text-align: center;
             font-size: 1rem;
             font-weight: 700;
@@ -165,9 +181,9 @@
             color: var(--text-main);
             border-radius: 6px;
             padding: 4px;
-            width: 42px;
+            width: 48px;
             text-align: center;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 600;
             outline: none;
         }
@@ -178,7 +194,7 @@
             color: var(--output-black);
             border-radius: 8px;
             padding: 8px;
-            width: 75px;
+            width: 85px;
             text-align: center;
             font-size: 1rem;
             font-weight: 700;
@@ -190,12 +206,19 @@
             gap: 1px;
         }
 
-        /* 下方表格樣式 */
+        /* 表格響應式容器 */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 20px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
             background-color: #ffffff;
+            min-width: 600px; /* 確保手機版不會擠壓扁掉 */
         }
 
         th, td {
@@ -268,7 +291,43 @@
             padding-top: 30px;
         }
 
-        /* 列印與 PDF 設定 */
+        /* ==================== 手機 RWD 畫面優化 (小於 768px) ==================== */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            .container {
+                padding: 20px 14px;
+            }
+            .header-area {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+                margin-bottom: 20px;
+            }
+            .print-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 12px;
+            }
+            /* 關鍵防放大：手機版輸入框字體必須至少 16px */
+            .input-red-core, .input-red-growth, .output-black {
+                font-size: 16px !important;
+            }
+            .input-red-growth {
+                width: 52px;
+            }
+            th, td {
+                padding: 12px 8px;
+                font-size: 0.9rem;
+            }
+            .chart-container {
+                height: 300px;
+                margin-top: 25px;
+            }
+        }
+
+        /* 列印與 PDF 匯出設定 */
         @media print {
             body { background-color: #ffffff; padding: 0; margin: 0; }
             .container { box-shadow: none; padding: 0; max-width: 100%; width: 100%; }
@@ -355,55 +414,57 @@
         </div>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th class="table-diagonal" style="width: 140px; height: 52px;">
-                    <div class="diagonal-bottom">本益比</div>
-                    <div class="diagonal-top">年度</div>
-                </th>
-                <th>2026<span id="sub-eps-2026" class="table-eps-sub">EPS: -</span></th>
-                <th>2027<span id="sub-eps-2027" class="table-eps-sub">EPS: -</span></th>
-                <th>2028<span id="sub-eps-2028" class="table-eps-sub">EPS: -</span></th>
-                <th>2029<span id="sub-eps-2029" class="table-eps-sub">EPS: -</span></th>
-                <th>2030<span id="sub-eps-2030" class="table-eps-sub">EPS: -</span></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr data-pe="20">
-                <td class="pe-row-head">20 x</td>
-                <td id="p-2026-20" class="calculated-price">-</td>
-                <td id="p-2027-20" class="calculated-price">-</td>
-                <td id="p-2028-20" class="calculated-price">-</td>
-                <td id="p-2029-20" class="calculated-price">-</td>
-                <td id="p-2030-20" class="calculated-price">-</td>
-            </tr>
-            <tr data-pe="23">
-                <td class="pe-row-head">23 x</td>
-                <td id="p-2026-23" class="calculated-price">-</td>
-                <td id="p-2027-23" class="calculated-price">-</td>
-                <td id="p-2028-23" class="calculated-price">-</td>
-                <td id="p-2029-23" class="calculated-price">-</td>
-                <td id="p-2030-23" class="calculated-price">-</td>
-            </tr>
-            <tr data-pe="25">
-                <td class="pe-row-head">25 x</td>
-                <td id="p-2026-25" class="calculated-price">-</td>
-                <td id="p-2027-25" class="calculated-price">-</td>
-                <td id="p-2028-25" class="calculated-price">-</td>
-                <td id="p-2029-25" class="calculated-price">-</td>
-                <td id="p-2030-25" class="calculated-price">-</td>
-            </tr>
-            <tr data-pe="28">
-                <td class="pe-row-head">28 x</td>
-                <td id="p-2026-28" class="calculated-price">-</td>
-                <td id="p-2027-28" class="calculated-price">-</td>
-                <td id="p-2028-28" class="calculated-price">-</td>
-                <td id="p-2029-28" class="calculated-price">-</td>
-                <td id="p-2030-28" class="calculated-price">-</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th class="table-diagonal" style="width: 140px; height: 52px;">
+                        <div class="diagonal-bottom">本益比</div>
+                        <div class="diagonal-top">年度</div>
+                    </th>
+                    <th>2026<span id="sub-eps-2026" class="table-eps-sub">EPS: -</span></th>
+                    <th>2027<span id="sub-eps-2027" class="table-eps-sub">EPS: -</span></th>
+                    <th>2028<span id="sub-eps-2028" class="table-eps-sub">EPS: -</span></th>
+                    <th>2029<span id="sub-eps-2029" class="table-eps-sub">EPS: -</span></th>
+                    <th>2030<span id="sub-eps-2030" class="table-eps-sub">EPS: -</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-pe="20">
+                    <td class="pe-row-head">20 x</td>
+                    <td id="p-2026-20" class="calculated-price">-</td>
+                    <td id="p-2027-20" class="calculated-price">-</td>
+                    <td id="p-2028-20" class="calculated-price">-</td>
+                    <td id="p-2029-20" class="calculated-price">-</td>
+                    <td id="p-2030-20" class="calculated-price">-</td>
+                </tr>
+                <tr data-pe="23">
+                    <td class="pe-row-head">23 x</td>
+                    <td id="p-2026-23" class="calculated-price">-</td>
+                    <td id="p-2027-23" class="calculated-price">-</td>
+                    <td id="p-2028-23" class="calculated-price">-</td>
+                    <td id="p-2029-23" class="calculated-price">-</td>
+                    <td id="p-2030-23" class="calculated-price">-</td>
+                </tr>
+                <tr data-pe="25">
+                    <td class="pe-row-head">25 x</td>
+                    <td id="p-2026-25" class="calculated-price">-</td>
+                    <td id="p-2027-25" class="calculated-price">-</td>
+                    <td id="p-2028-25" class="calculated-price">-</td>
+                    <td id="p-2029-25" class="calculated-price">-</td>
+                    <td id="p-2030-25" class="calculated-price">-</td>
+                </tr>
+                <tr data-pe="28">
+                    <td class="pe-row-head">28 x</td>
+                    <td id="p-2026-28" class="calculated-price">-</td>
+                    <td id="p-2027-28" class="calculated-price">-</td>
+                    <td id="p-2028-28" class="calculated-price">-</td>
+                    <td id="p-2029-28" class="calculated-price">-</td>
+                    <td id="p-2030-28" class="calculated-price">-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <div class="chart-container">
         <canvas id="valuationChart"></canvas>
@@ -426,7 +487,6 @@
     const years = [2026, 2027, 2028, 2029, 2030];
     let valuationChart;
 
-    // 格式化功能：四捨五入取整數並包含千分位
     function formatEps(num) {
         if (isNaN(num) || num === null) return '-';
         return Math.round(num).toLocaleString();
@@ -434,8 +494,6 @@
 
     function initChart() {
         const ctx = document.getElementById('valuationChart').getContext('2d');
-        
-        // 優化配色：20倍用綠色，越高越趨近紅色，28倍完全為紅色
         const colors = ['#22c55e', '#eab308', '#f97316', '#ef4444']; 
         
         valuationChart = new Chart(ctx, {
@@ -446,7 +504,7 @@
                     label: `${pe} x 本益比情境`,
                     data: [null, null, null, null, null],
                     borderColor: colors[idx],
-                    backgroundColor: colors[idx] + '10', // 輕量透明填充
+                    backgroundColor: colors[idx] + '10', 
                     borderWidth: 3,
                     pointBackgroundColor: colors[idx],
                     pointRadius: 4,
@@ -512,13 +570,11 @@
         const g2029 = parseFloat(growth2029Input.value) || 0;
         const g2030 = parseFloat(growth2030Input.value) || 0;
 
-        // 計算精準複利 EPS
         const eps2027 = eps2026 * (1 + g2027 / 100);
         const eps2028 = eps2027 * (1 + g2028 / 100);
         const eps2029 = eps2028 * (1 + g2029 / 100);
         const eps2030 = eps2029 * (1 + g2030 / 100);
 
-        // 顯示四捨五入整數
         eps2027Output.value = formatEps(eps2027);
         eps2028Output.value = formatEps(eps2028);
         eps2029Output.value = formatEps(eps2029);
@@ -532,12 +588,10 @@
             2030: eps2030
         };
 
-        // 更新表格表頭副標題
         years.forEach(year => {
             document.getElementById(`sub-eps-${year}`).innerText = `EPS: ${formatEps(dataMap[year])}`;
         });
 
-        // 以四捨五入後的整數 EPS 推導股價矩陣
         peRows.forEach((pe, peIdx) => {
             const rowDataForChart = [];
             years.forEach(year => {
